@@ -1,0 +1,56 @@
+# family_monster/.gitignore
+# Archivos que NUNCA deben subirse a GitHub: secretos, dependencias instaladas y archivos generados.
+# Regla de oro: si un archivo contiene una contraseña, un token o datos reales, va aquí.
+
+# ---------------------------------------------------------------------------
+# Secretos y configuración local (jamás se versionan; la plantilla .env.example sí)
+# ---------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+
+# ---------------------------------------------------------------------------
+# Python (backend)
+# ---------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+htmlcov/
+.coverage
+
+# ---------------------------------------------------------------------------
+# Node (frontend)
+# ---------------------------------------------------------------------------
+node_modules/
+dist/
+.vite/
+coverage/
+*.tsbuildinfo
+
+# ---------------------------------------------------------------------------
+# Vercel (carpeta local que crea la herramienta de despliegue)
+# ---------------------------------------------------------------------------
+.vercel/
+
+# ---------------------------------------------------------------------------
+# Copias de seguridad y datos locales (pueden contener información financiera real)
+# ---------------------------------------------------------------------------
+*.dump
+*.sqlite3
+backups/
+
+# ---------------------------------------------------------------------------
+# Registros y archivos del sistema o del editor
+# ---------------------------------------------------------------------------
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

@@ -1,0 +1,2 @@
+# backend/app/modules/audit/__init__.py
+# Marca la carpeta como paquete de Python.
