@@ -1,5 +1,8 @@
-# backend/tests/modules/test_integridad_modulos_bd.py
-# Barreras de w
+# backend/tests/test_integridad_modulos_bd.py
+# Barreras de integridad en la base de datos para repartos, pagos, préstamos, obligaciones y
+# movimientos: comprueba que PostgreSQL rechaza por sí mismo cambios imposibles, incluso con SQL directo.
+
+import uuid  # Genera claves de idempotencia únicas para los movimientos creados a mano en las pruebas.
 from datetime import date
 from decimal import Decimal
 

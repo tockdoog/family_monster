@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 from app.modules.loans.models import Cuota, PagoCuota, Prestamo
 from app.modules.transactions.models import EstadoMovimiento, Movimiento
 
+# Estado de un movimiento vigente: los pagos de movimientos revertidos no cuentan como pagado.
 _CONFIRMADA = EstadoMovimiento.CONFIRMADA.value
 
 
@@ -21,6 +22,17 @@ def crear_prestamo(db: Session, **campos) -> Prestamo:
     db.add(prestamo)
     db.flush()
     return prestamo
+
+
+def prestamo_por_desembolso(db: Session, movimiento_id: uuid.UUID) -> Prestamo:
+    """Préstamo creado por un desembolso ya registrado.
+
+    Se usa cuando el cliente repite la creación con la misma clave de idempotencia: el movimiento de
+    desembolso original ya existe y se devuelve su préstamo sin crear otro.
+    """
+    return db.execute(
+        select(Prestamo).where(Prestamo.desembolso_transaction_id == movimiento_id)
+    ).scalar_one()
 
 
 def crear_cuotas(
@@ -111,6 +123,20 @@ def crear_pago(
     db.add(pago)
     db.flush()
     return pago
+
+
+def pago_por_movimiento(db: Session, movimiento_id: uuid.UUID) -> tuple[PagoCuota, Cuota]:
+    """Pago de cuota (y la cuota que paga) vinculado a un movimiento ya registrado.
+
+    Se usa cuando el cliente repite un pago con la misma clave de idempotencia: el movimiento original
+    ya existe y se devuelve su pago sin cobrar de nuevo.
+    """
+    fila = db.execute(
+        select(PagoCuota, Cuota)
+        .join(Cuota, Cuota.id == PagoCuota.installment_id)
+        .where(PagoCuota.transaction_id == movimiento_id)
+    ).one()
+    return fila[0], fila[1]
 
 
 def tiene_pagos_confirmados(db: Session, desembolso_movimiento_id: uuid.UUID) -> bool:

@@ -16,7 +16,9 @@ from app.db.base import Base
 # Configuración de Alembic y de sus logs.
 config = context.config
 if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+    # disable_existing_loggers=False: Alembic no debe silenciar los registros de la aplicación
+    # (por ejemplo, el de errores 500), que ya existen cuando se ejecutan las migraciones desde las pruebas.
+    fileConfig(config.config_file_name, disable_existing_loggers=False)
 
 
 def importar_modelos() -> None:

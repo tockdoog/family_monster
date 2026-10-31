@@ -1,14 +1,17 @@
 # backend/app/main.py
 # Punto de entrada de la API de Familia Monster. Vercel detecta la variable "app" de este archivo.
 
+import logging
 from collections.abc import Awaitable, Callable
 from urllib.parse import urlsplit
 
 from fastapi import APIRouter, FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
 
 from app.core.config import obtener_configuracion
 from app.core.exceptions import registrar_manejadores_errores, respuesta_error
+from app.db.session import obtener_fabrica_sesiones
 from app.modules.accounts.router import router as router_cuentas
 from app.modules.audit.router import router as router_auditoria
 from app.modules.categories.router import router as router_categorias
@@ -24,7 +27,10 @@ from app.modules.reports.router import router as router_informes
 from app.modules.reports.router import router_tablero
 from app.modules.transactions.router import router as router_movimientos
 
-VERSION_API = "0.5.0"
+VERSION_API = "0.5.1"
+
+# Registro de eventos técnicos del servicio (los detalles quedan en los logs, nunca en la respuesta).
+registro = logging.getLogger("familia_monster.salud")
 
 # Métodos que modifican datos: son los que requieren protección contra CSRF.
 _METODOS_CON_CAMBIOS = {"POST", "PUT", "PATCH", "DELETE"}
@@ -78,6 +84,23 @@ def crear_router_v1() -> APIRouter:
     async def salud() -> dict[str, str]:
         # No consulta la base de datos ni expone información interna.
         return {"estado": "ok", "version": VERSION_API}
+
+    @router.get("/preparacion", tags=["Sistema"], summary="Disponibilidad real del servicio")
+    def preparacion(respuesta: Response) -> dict[str, str]:
+        """Comprueba que la API pueda consultar PostgreSQL.
+
+        Responde 200 si la base contesta y 503 si no. El detalle técnico del fallo se guarda
+        en los logs del servidor; al cliente solo se le informa el estado general.
+        """
+        try:
+            # Sesión propia (sin la transacción por solicitud): solo se ejecuta una consulta mínima.
+            with obtener_fabrica_sesiones()() as sesion:
+                sesion.execute(text("SELECT 1"))
+        except Exception:
+            registro.exception("Falló la comprobación de la base de datos")
+            respuesta.status_code = 503
+            return {"estado": "degradado", "base_de_datos": "error", "version": VERSION_API}
+        return {"estado": "ok", "base_de_datos": "ok", "version": VERSION_API}
 
     router.include_router(router_instalacion)
     router.include_router(router_auth)

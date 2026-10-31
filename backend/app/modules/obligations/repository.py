@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from app.modules.obligations.models import Obligacion, PagoObligacion
 from app.modules.transactions.models import EstadoMovimiento, Movimiento
 
+# Estado de un movimiento vigente: los pagos de movimientos revertidos no cuentan como pagado.
 _CONFIRMADA = EstadoMovimiento.CONFIRMADA.value
 
 
@@ -78,6 +79,18 @@ def crear_pago(
     db.add(pago)
     db.flush()
     return pago
+
+
+def pago_por_movimiento(db: Session, movimiento_id: uuid.UUID) -> PagoObligacion:
+    """Pago de obligación vinculado a un movimiento ya registrado.
+
+    Se usa cuando el cliente repite un pago con la misma clave de idempotencia: el movimiento original
+    ya existe (y ya pertenece al hogar, porque se halló por su clave) y se devuelve su pago sin cobrar de nuevo.
+    Hay como máximo uno por movimiento (restricción única en la base de datos).
+    """
+    return db.execute(
+        select(PagoObligacion).where(PagoObligacion.transaction_id == movimiento_id)
+    ).scalar_one()
 
 
 def pagos_de(db: Session, obligacion_id: uuid.UUID) -> list[tuple[PagoObligacion, Movimiento]]:
