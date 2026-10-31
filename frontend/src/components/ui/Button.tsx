@@ -29,7 +29,7 @@ export function Button({ variante = "primary", cargando = false, className, disa
       disabled={disabled || cargando}
       aria-busy={cargando}
       className={cn(
-        "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-5 font-semibold transition-colors",
+        "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-5 font-semibold transition duration-150 enabled:active:scale-[0.97]",
         "disabled:cursor-not-allowed disabled:opacity-60",
         ESTILOS[variante],
         className,

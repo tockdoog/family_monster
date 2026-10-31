@@ -1,12 +1,12 @@
 // frontend/src/features/dashboard/components/IndicadorCard.tsx
-// Tarjeta de un indicador: nombre, explicación, monto en COP y entrada animada.
+// Tarjeta de un indicador: nombre, explicación, monto en COP que sube al aparecer y entrada animada.
 
 import type { LucideIcon } from "lucide-react";
 import { motion } from "motion/react";
 import type { ReactNode } from "react";
 import { Ayuda } from "@/components/ui/Ayuda";
 import { Card } from "@/components/ui/Card";
-import { formatCOP } from "@/lib/formatCOP";
+import { NumeroAnimado } from "@/components/ui/NumeroAnimado";
 
 interface Props {
   etiqueta: string;
@@ -21,7 +21,7 @@ interface Props {
 export function IndicadorCard({ etiqueta, ayuda, valor, icono: Icono, detalle, retraso = 0 }: Props) {
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: retraso }}>
-      <Card className="h-full">
+      <Card elevable className="h-full">
         <div className="flex items-center justify-between text-morado-secundario">
           <span className="flex items-center gap-1 text-sm font-semibold">
             {etiqueta}
@@ -29,7 +29,7 @@ export function IndicadorCard({ etiqueta, ayuda, valor, icono: Icono, detalle, r
           </span>
           <Icono size={22} aria-hidden />
         </div>
-        <p className="cifras mt-2 text-2xl font-extrabold text-morado">{formatCOP(valor)}</p>
+        <p className="cifras mt-2 text-2xl font-extrabold text-morado"><NumeroAnimado valor={valor} /></p>
         {detalle && <div className="mt-1 text-sm text-texto-suave">{detalle}</div>}
       </Card>
     </motion.div>

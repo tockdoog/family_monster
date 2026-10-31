@@ -1,9 +1,11 @@
 // frontend/src/components/layout/AppLayout.tsx
-// Estructura de la app autenticada: barra lateral (tablet/escritorio), barra inferior con "Más" (móvil) y encabezado.
+// Estructura de la app autenticada: barra lateral, barra inferior con "Más" (móvil), encabezado y
+// transición suave entre pantallas. El indicador de la sección activa se desliza entre enlaces.
 
 import { Ellipsis, LogOut } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
-import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useOutlet } from "react-router-dom";
 import { useAuth } from "@/app/providers/AuthProvider";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
@@ -20,6 +22,7 @@ const EN_BARRA_MOVIL = 4;
 export function AppLayout() {
   const { sesion, salir, puede } = useAuth();
   const { pathname } = useLocation();
+  const pantalla = useOutlet();
   const [masAbierto, setMasAbierto] = useState(false);
   // Se ocultan los enlaces para los que el rol no tiene permiso (solo cosmético).
   const items = NAVEGACION.filter((i) => !i.permiso || puede(i.permiso));
@@ -27,13 +30,9 @@ export function AppLayout() {
   const resto = items.slice(EN_BARRA_MOVIL);
   const restoActivo = resto.some((i) => pathname.startsWith(i.ruta));
 
-  // Estilo de un enlace de la barra lateral.
-  const claseLateral = ({ isActive }: { isActive: boolean }) =>
-    cn("flex min-h-11 items-center gap-3 rounded-xl px-3 font-semibold transition-colors", isActive ? "bg-violeta text-blanco" : "text-lavanda hover:bg-morado-secundario");
-
   // Estilo de un enlace de la barra inferior (vertical, con texto pequeño).
-  const claseMovil = ({ isActive }: { isActive: boolean }) =>
-    cn("flex min-h-11 min-w-14 flex-1 flex-col items-center justify-center rounded-xl text-xs font-semibold", isActive ? "text-blanco" : "text-lavanda");
+  const claseMovil = (activo: boolean) =>
+    cn("relative flex min-h-11 min-w-14 flex-1 flex-col items-center justify-center rounded-xl text-xs font-semibold", activo ? "text-blanco" : "text-lavanda");
 
   return (
     <div className="min-h-screen md:pl-20 lg:pl-64">
@@ -45,9 +44,20 @@ export function AppLayout() {
         </p>
         <nav aria-label="Principal" className="space-y-1">
           {items.map(({ ruta, etiqueta, icono: Icono }) => (
-            <NavLink key={ruta} to={ruta} className={claseLateral} aria-label={etiqueta}>
-              <Icono size={22} aria-hidden />
-              <span className="hidden lg:inline">{etiqueta}</span>
+            <NavLink
+              key={ruta}
+              to={ruta}
+              aria-label={etiqueta}
+              className={({ isActive }) => cn("relative flex min-h-11 items-center gap-3 rounded-xl px-3 font-semibold transition-colors", isActive ? "text-blanco" : "text-lavanda hover:bg-morado-secundario")}
+            >
+              {({ isActive }) => (
+                <>
+                  {/* Píldora que se desliza hacia la sección activa */}
+                  {isActive && <motion.span layoutId="pildora-lateral" className="absolute inset-0 rounded-xl bg-violeta" transition={{ type: "spring", stiffness: 400, damping: 34 }} />}
+                  <Icono size={22} aria-hidden className="relative" />
+                  <span className="relative hidden lg:inline">{etiqueta}</span>
+                </>
+              )}
             </NavLink>
           ))}
         </nav>
@@ -65,21 +75,30 @@ export function AppLayout() {
         </Button>
       </header>
 
-      {/* Contenido: deja espacio inferior para la barra móvil */}
+      {/* Contenido: cada pantalla entra con un fundido corto; la anterior sale antes */}
       <main className="p-4 pb-28 md:p-8 md:pb-8">
-        <Outlet />
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div key={pathname} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.18 }}>
+            {pantalla}
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       {/* Navegación móvil inferior, respetando el área segura del iPhone */}
       <nav aria-label="Principal" className="fixed inset-x-0 bottom-0 flex justify-around bg-morado-profundo px-2 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] md:hidden">
         {enBarra.map(({ ruta, etiqueta, icono: Icono }) => (
-          <NavLink key={ruta} to={ruta} className={claseMovil}>
-            <Icono size={22} aria-hidden />
-            {etiqueta}
+          <NavLink key={ruta} to={ruta} className={({ isActive }) => claseMovil(isActive)}>
+            {({ isActive }) => (
+              <>
+                {isActive && <motion.span layoutId="indicador-movil" className="absolute -top-2 h-1 w-8 rounded-full bg-lavanda" transition={{ type: "spring", stiffness: 400, damping: 34 }} />}
+                <Icono size={22} aria-hidden />
+                {etiqueta}
+              </>
+            )}
           </NavLink>
         ))}
         {resto.length > 0 && (
-          <button type="button" onClick={() => setMasAbierto(true)} className={claseMovil({ isActive: restoActivo })} aria-haspopup="dialog">
+          <button type="button" onClick={() => setMasAbierto(true)} className={claseMovil(restoActivo)} aria-haspopup="dialog">
             <Ellipsis size={22} aria-hidden />
             Más
           </button>

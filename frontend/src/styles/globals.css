@@ -30,3 +30,40 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Animaciones (solo CSS, baratas para el navegador). Las anula la regla de
+   prefers-reduced-motion de arriba.
+   --------------------------------------------------------------------------- */
+
+/* Entrada escalonada de tarjetas: agrega la clase "escalonado" al contenedor de una cuadrícula o lista.
+   "backwards" aplica el estado inicial solo durante el retraso, para no pisar el efecto hover. */
+@keyframes subir-suave {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.escalonado > * { animation: subir-suave 0.4s ease-out backwards; }
+.escalonado > :nth-child(2) { animation-delay: 60ms; }
+.escalonado > :nth-child(3) { animation-delay: 120ms; }
+.escalonado > :nth-child(4) { animation-delay: 180ms; }
+.escalonado > :nth-child(5) { animation-delay: 240ms; }
+.escalonado > :nth-child(6) { animation-delay: 300ms; }
+.escalonado > :nth-child(7) { animation-delay: 360ms; }
+.escalonado > :nth-child(n + 8) { animation-delay: 420ms; }
+
+/* Ventanas modales: aparecen con un pequeño zoom y el fondo se oscurece suavemente. */
+@keyframes modal-entra {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes fondo-entra { from { opacity: 0; } to { opacity: 1; } }
+dialog[open] { animation: modal-entra 0.22s ease-out; }
+dialog[open]::backdrop { animation: fondo-entra 0.22s ease-out; }
+
+/* Bienvi: flota despacio, parpadea de vez en cuando y saluda dos veces al aparecer. */
+@keyframes bienvi-flota { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes bienvi-saludo { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-18deg); } 75% { transform: rotate(14deg); } }
+@keyframes bienvi-parpadeo { 0%, 92%, 100% { transform: scaleY(1); } 96% { transform: scaleY(0.1); } }
+.bienvi-flota { animation: bienvi-flota 4s ease-in-out infinite; }
+.bienvi-saludo { transform-origin: 160px 112px; animation: bienvi-saludo 1.2s ease-in-out 0.6s 2; }
+.bienvi-parpadeo { transform-origin: 100px 98px; animation: bienvi-parpadeo 5s infinite; }
