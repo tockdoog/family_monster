@@ -29,11 +29,11 @@ export function Input({ etiqueta, error, accion, className, id, ...resto }: Prop
           className={cn(
             "min-h-11 w-full rounded-xl border-2 bg-blanco px-4 text-texto placeholder:text-texto-suave",
             error ? "border-alerta" : "border-lavanda/60",
-            accion && "pr-12",
+            accion ? "pr-12" : false,
             className,
           )}
         />
-        {accion && <div className="absolute inset-y-0 right-1 flex items-center">{accion}</div>}
+        {accion ? <div className="absolute inset-y-0 right-1 flex items-center">{accion}</div> : null}
       </div>
       {error && (
         <p id={idError} role="alert" className="mt-1 text-sm text-red-700">

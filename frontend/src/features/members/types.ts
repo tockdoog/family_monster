@@ -1,5 +1,5 @@
 // frontend/src/features/members/types.ts
-// Tipo del integrante según members/schemas.py → IntegranteSalida.
+// Tipos de integrantes según members/schemas.py.
 
 /** Integrante del hogar; "rol" es null si no tiene acceso a la aplicación. */
 export interface Integrante {
@@ -9,3 +9,13 @@ export interface Integrante {
   tiene_acceso: boolean;
   rol: string | null;
 }
+
+/** Cuerpo de POST /members/{id}/acceso. */
+export interface NuevoAcceso {
+  email: string;
+  contrasena: string;
+  rol: "admin" | "miembro";
+}
+
+/** Nombre en español de cada rol. */
+export const ETIQUETA_ROL: Record<string, string> = { admin: "Administrador", miembro: "Miembro" };

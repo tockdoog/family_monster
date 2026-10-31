@@ -13,7 +13,7 @@
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
     "isolatedModules": true,
-    "types": ["vite/client", "vitest/globals"],
+    "types": ["vite/client", "vitest/globals", "node"],
     "baseUrl": ".",
     "paths": { "@/*": ["src/*"] }
   },

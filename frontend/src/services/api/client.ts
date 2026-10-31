@@ -89,6 +89,21 @@ async function peticion<T>(metodo: string, ruta: string, op: OpcionesPeticion = 
   return cuerpo as T;
 }
 
+/** Descarga un archivo (ej. CSV) con la sesión actual; los errores del backend llegan como ErrorApi. */
+async function descargar(ruta: string): Promise<Blob> {
+  let respuesta: Response;
+  try {
+    respuesta = await fetch(`${BASE_URL}${ruta}`, { method: "GET", credentials: "include" });
+  } catch {
+    throw new ErrorApi(0, "sin_conexion", "No hay conexión con el servidor. Revisa tu internet.");
+  }
+  if (!respuesta.ok) {
+    if (respuesta.status === 401) alSesionExpirada?.();
+    throw leerError(respuesta.status, await respuesta.json().catch(() => null));
+  }
+  return respuesta.blob();
+}
+
 // API pública del cliente: un método por verbo HTTP.
 export const api = {
   get: <T>(ruta: string, signal?: AbortSignal) => peticion<T>("GET", ruta, { signal }),
@@ -97,4 +112,5 @@ export const api = {
   put: <T>(ruta: string, cuerpo?: unknown) => peticion<T>("PUT", ruta, { cuerpo }),
   patch: <T>(ruta: string, cuerpo?: unknown) => peticion<T>("PATCH", ruta, { cuerpo }),
   delete: <T>(ruta: string) => peticion<T>("DELETE", ruta),
+  descargar,
 };

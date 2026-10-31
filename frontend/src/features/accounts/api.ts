@@ -5,11 +5,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/services/api/client";
 import type { Cuenta } from "@/types/finanzas";
 
-/** Cuerpo de POST /accounts para cuentas de fondo común (las personales llegan con el módulo de integrantes). */
+/** Cuerpo de POST /accounts. "propietario_id" solo se envía en cuentas personales. */
 export interface NuevaCuenta {
   nombre: string;
-  tipo: "efectivo" | "banco" | "otra";
+  tipo: "efectivo" | "banco" | "personal" | "otra";
   saldo_inicial: number;
+  propietario_id?: string;
 }
 
 /** Lista las cuentas con el saldo calculado por el backend. */
