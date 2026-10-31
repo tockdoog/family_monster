@@ -1,0 +1,29 @@
+/* frontend/src/styles/theme.css */
+/* Tokens de diseño de Familia Monster (morado y blanco). Para cambiar la paleta, solo se edita este archivo. */
+
+@import "tailwindcss";
+
+@theme {
+  /* Identidad principal: morados y blanco */
+  --color-morado-profundo: #24113f;
+  --color-morado: #35165d;
+  --color-morado-secundario: #59318b;
+  --color-violeta: #7042c8;
+  --color-lavanda: #a78bfa;
+  --color-blanco: #ffffff;
+
+  /* Superficies y texto */
+  --color-fondo: #f5f3fa;
+  --color-texto: #252033;
+  --color-texto-suave: #777184;
+
+  /* Estados financieros (uso reservado) */
+  --color-exito: #22c55e;
+  --color-alerta: #ef4444;
+  --color-aviso: #f59e0b;
+
+  /* Radios, sombras y tipografía del sistema (sin fuentes externas: más rápido y compatible con la CSP) */
+  --radius-tarjeta: 1rem;
+  --shadow-tarjeta: 0 4px 16px rgb(36 17 63 / 0.08);
+  --font-sans: ui-rounded, "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+}

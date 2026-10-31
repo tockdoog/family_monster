@@ -1,0 +1,32 @@
+/* frontend/src/styles/globals.css */
+/* Estilos globales: fondo, foco visible para teclado y respeto a prefers-reduced-motion. */
+
+@import "./theme.css";
+
+/* Base de la página */
+body {
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Foco visible y consistente (accesibilidad) */
+:focus-visible {
+  outline: 3px solid var(--color-lavanda);
+  outline-offset: 2px;
+}
+
+/* Cifras alineadas para montos */
+.cifras {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Quita animaciones a quien las desactivó en su sistema */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
