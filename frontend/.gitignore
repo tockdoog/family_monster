@@ -1,0 +1,16 @@
+# frontend/.gitignore
+# Archivos que NO deben subirse a GitHub (dependencias, compilados y variables locales).
+
+node_modules/
+dist/
+coverage/
+.vercel/
+
+# Variables de entorno locales
+.env.local
+.env.*.local
+
+# Archivos temporales de Vite y del sistema
+*.timestamp-*.mjs
+.DS_Store
+npm-debug.log*
